@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - UI
+  - Pause
+  - VidPlayer
   layers:
   - Default
   - TransparentFX
