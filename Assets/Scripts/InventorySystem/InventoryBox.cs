@@ -27,10 +27,12 @@ public class InventoryBox : SingletonMonobehaviour<InventoryBox>
     {
         if (inventoryDictionary.TryGetValue(itemGuid, out InventorySlot slot))
         {
+            Debug.Log($"Got Item {itemGuid}");
             slot.Add(quantity);
         }
         else
         {
+            Debug.Log($"Got New Item {itemGuid}");
             InventorySlot newSlot = new InventorySlot(itemGuid, quantity);
             inventoryList.Add(newSlot);
             inventoryDictionary.Add(itemGuid, newSlot);
@@ -47,11 +49,11 @@ public class InventoryBox : SingletonMonobehaviour<InventoryBox>
                 return false;
             }
             slot.Remove(quantity);
-            if (slot.quantity <= 0)
+            /*if (slot.quantity <= 0)
             {
                 inventoryList.Remove(slot);
                 inventoryDictionary.Remove(itemGuid);
-            }
+            }*/
             return true;
         }
         else

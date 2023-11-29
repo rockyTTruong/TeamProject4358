@@ -12,12 +12,14 @@ public class PlayerFallingState : PlayerState
 
     public override void Enter()
     {
+        playerStateMachine.isFalling = true;
         PlayAnimation(fallHash, crossFadeDuration);
         InputReader.Instance.DpadDownButtonPressEvent += LockOnMode;
     }
 
     public override void Exit()
     {
+        playerStateMachine.isFalling = false;
         InputReader.Instance.DpadDownButtonPressEvent -= LockOnMode;
     }
 
@@ -25,7 +27,7 @@ public class PlayerFallingState : PlayerState
     {
         HandlePlayerMovement();
         HandleCameraMovement();
-        if (playerStateMachine.controller.isGrounded)
+        if (playerStateMachine.groundChecker.IsGrounded)
         {
             playerStateMachine.SwitchState(new PlayerFreeLookState(playerStateMachine));
         }

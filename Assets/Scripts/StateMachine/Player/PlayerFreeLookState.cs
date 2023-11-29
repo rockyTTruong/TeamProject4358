@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class PlayerFreeLookState : PlayerState
 {
@@ -16,6 +17,7 @@ public class PlayerFreeLookState : PlayerState
     {
         InputReader.Instance.EnableFreelookInputReader();
         InputReader.Instance.DpadUpButtonPressEvent += UseItem;
+        InputReader.Instance.DpadRightButtonPressEvent += SwitchItem;
         InputReader.Instance.DpadLeftButtonPressEvent += QuickSwitchWeapon;
         InputReader.Instance.SouthButtonPressEvent += Jump;
         InputReader.Instance.EastButtonPressEvent += Dodge;
@@ -31,6 +33,7 @@ public class PlayerFreeLookState : PlayerState
     public override void Exit()
     {
         InputReader.Instance.DpadUpButtonPressEvent -= UseItem;
+        InputReader.Instance.DpadRightButtonPressEvent -= SwitchItem;
         InputReader.Instance.DpadLeftButtonPressEvent -= QuickSwitchWeapon;
         InputReader.Instance.SouthButtonPressEvent -= Jump;
         InputReader.Instance.EastButtonPressEvent -= Dodge;
@@ -44,10 +47,14 @@ public class PlayerFreeLookState : PlayerState
 
     public override void Tick()
     {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            Cheat();
+        }
         UpdateAnimator();
         HandleCameraMovement();
         HandlePlayerMovement();
-        if (!playerStateMachine.controller.isGrounded) playerStateMachine.SwitchState(new PlayerFallingState(playerStateMachine));
+        if (!playerStateMachine.groundChecker.IsGrounded) playerStateMachine.SwitchState(new PlayerFallingState(playerStateMachine));
 
         footstepInterval += Time.deltaTime;
         if (InputReader.Instance.leftStickValue == Vector2.zero) return;
@@ -108,6 +115,14 @@ public class PlayerFreeLookState : PlayerState
         }
         else if (weaponType == WeaponType.Bow)
         {
+            InventorySlot arrowSlot = InventoryBox.Instance.CheckInventory("5003");
+            if (arrowSlot == null || arrowSlot.quantity < 1)
+            {
+                Debug.Log($"Out of arrow.");
+                return;
+            }
+            InventoryBox.Instance.RemoveItem("5003", 1);
+            EventHandler.OnUseItemEvent("5003");
             playerStateMachine.SwitchState(new PlayerAttackingState(playerStateMachine, playerStateMachine.comboManager.normalBowCombo, 0));
         }
         else return;
@@ -150,12 +165,40 @@ public class PlayerFreeLookState : PlayerState
 
     private void UseItem()
     {
-        string itemGuid = "1001"; //RedPotion
+        string itemGuid = playerStateMachine.currentItemGuid;
+        Debug.Log($"Try using item {itemGuid}");
         if (InventoryBox.Instance.RemoveItem(itemGuid, 1))
         {
             ConsumableItemData consumableItem = (ConsumableItemData)ItemDatabase.Instance.GetItemData(itemGuid);
             consumableItem.Use(playerStateMachine.gameObject);
             EventHandler.OnUseItemEvent(itemGuid);
         }
+    }
+
+    private void SwitchItem()
+    {
+        if (playerStateMachine.currentItemGuid == "1001")
+        {
+            playerStateMachine.currentItemGuid = "1002";
+            GameObject.FindObjectOfType<QuickSlotManager>().UpdateCurrentItemInfo("1002");
+
+        }
+        else if (playerStateMachine.currentItemGuid == "1002")
+        {
+            playerStateMachine.currentItemGuid = "1001";
+            GameObject.FindObjectOfType<QuickSlotManager>().UpdateCurrentItemInfo("1001");
+
+        }
+        
+        Debug.Log($"Current Item {playerStateMachine.currentItemGuid}");
+    }
+
+    private void Cheat()
+    {
+        InventoryBox.Instance.AddItem("9999", 10);
+        InventoryBox.Instance.AddItem("9998", 10);
+        InventoryBox.Instance.AddItem("9997", 10);
+        GameObject.FindObjectOfType<QuickSlotManager>().UpdateUI();
+        CoinManager.Instance.UpdateUI();
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CutsceneTrigger : MonoBehaviour
 {
     public int videoIndex;
+    public bool triggerCutscene;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -24,6 +25,8 @@ public class CutsceneTrigger : MonoBehaviour
 
         FadeScreen.Instance.FadeIn();
         VideoManager.Instance.PlayVideo(videoIndex);
-        transform.parent.gameObject.SetActive(false);
+        transform.parent.Find("Cube").gameObject.SetActive(false);
+        transform.parent.Find("Cube (1)").gameObject.SetActive(false);
+        if(!triggerCutscene) this.gameObject.SetActive(false);
     }
 }

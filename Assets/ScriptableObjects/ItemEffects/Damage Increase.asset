@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21efac75e9ae0ab48be06233c47b1574, type: 3}
-  m_Name: Heal 20HP
+  m_Script: {fileID: 11500000, guid: 761f51e957753c349bec25bd55fd9b10, type: 3}
+  m_Name: Damage Increase
   m_EditorClassIdentifier: 
-  healAmount: 20
-  healEffect: {fileID: 8108297552573712994, guid: bf5f0d51887e1ee4ab5298093d54d675,
+  increaseAmount: 30
+  damageEffect: {fileID: 8108297552573712994, guid: 1472b1b683d0c584898c64892c285c1d,
     type: 3}
+  duration: 15
